@@ -52,7 +52,6 @@ pip install -e .
 python -m ccxa              # 通常起動
 python -m ccxa -v           # デバッグログ付き
 python -m ccxa --list-devices  # 音声デバイス一覧
-python -m ccxa --list-voices   # 日本語音声一覧
 ```
 
 ## 設定

@@ -18,9 +18,6 @@ def main() -> None:
         "--list-devices", action="store_true", help="List available audio devices"
     )
     parser.add_argument(
-        "--list-voices", action="store_true", help="List available Japanese TTS voices"
-    )
-    parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable debug logging"
     )
     args = parser.parse_args()
@@ -35,17 +32,6 @@ def main() -> None:
         import sounddevice as sd
 
         print(sd.query_devices())
-        return
-
-    if args.list_voices:
-        import subprocess
-
-        result = subprocess.run(
-            ["say", "-v", "?"], capture_output=True, text=True, check=True
-        )
-        for line in result.stdout.splitlines():
-            if "ja_JP" in line:
-                print(line)
         return
 
     from ccxa.app import VoiceChatApp
