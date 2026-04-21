@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ccxsa.utils.ring_buffer import RingBuffer
+from ccxa.utils.ring_buffer import RingBuffer
 
 
 def test_write_and_read():
@@ -42,7 +42,7 @@ def test_overflow_clamps():
 
 
 def test_wakeword_detector_exact():
-    from ccxsa.wakeword.detector import WakeWordDetector
+    from ccxa.wakeword.detector import WakeWordDetector
 
     det = WakeWordDetector(phrases=["チチクサ"])
     assert det.check("チチクサ")
@@ -52,7 +52,7 @@ def test_wakeword_detector_exact():
 
 
 def test_wakeword_detector_fuzzy():
-    from ccxsa.wakeword.detector import WakeWordDetector
+    from ccxa.wakeword.detector import WakeWordDetector
 
     det = WakeWordDetector(phrases=["チチクサ"], fuzzy_threshold=2)
     # Whisper may produce these variations

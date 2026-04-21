@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ccxsa.audio.noise_gate import NoiseGate
+from ccxa.audio.noise_gate import NoiseGate
 
 
 def test_noise_gate_silences_quiet_audio():

@@ -1,5 +1,5 @@
 [project]
-name = "ccxsa"
+name = "ccxa"
 version = "0.1.0"
 description = "Japanese Voice Chat Assistant for Mac mini M2"
 requires-python = ">=3.11,<3.14"
@@ -23,7 +23,7 @@ dependencies = [
 dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
 
 [project.scripts]
-ccxsa = "ccxsa.__main__:main"
+ccxa = "ccxa.__main__:main"
 
 [build-system]
 requires = ["setuptools>=68"]

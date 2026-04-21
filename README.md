@@ -1,4 +1,4 @@
-# ccxsa — チチクサ 日本語音声チャットアシスタント
+# ccxa — チチクサ 日本語音声チャットアシスタント
 
 Mac mini M2 (16GB) 上でローカル実行する日本語音声チャットボット。STT/LLM/TTS すべてローカルモデルで動作し、プライバシーを保ちつつリアルタイムな会話を実現します。
 
@@ -49,10 +49,10 @@ pip install -e .
 ## 使い方
 
 ```bash
-python -m ccxsa              # 通常起動
-python -m ccxsa -v           # デバッグログ付き
-python -m ccxsa --list-devices  # 音声デバイス一覧
-python -m ccxsa --list-voices   # 日本語音声一覧
+python -m ccxa              # 通常起動
+python -m ccxa -v           # デバッグログ付き
+python -m ccxa --list-devices  # 音声デバイス一覧
+python -m ccxa --list-voices   # 日本語音声一覧
 ```
 
 ## 設定
