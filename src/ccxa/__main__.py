@@ -48,8 +48,8 @@ def main() -> None:
                 print(line)
         return
 
-    from ccxsa.app import VoiceChatApp
-    from ccxsa.config import AppConfig
+    from ccxa.app import VoiceChatApp
+    from ccxa.config import AppConfig
 
     config = AppConfig.load(args.config)
     app = VoiceChatApp(config)

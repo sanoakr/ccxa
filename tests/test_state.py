@@ -1,6 +1,6 @@
 """Tests for state machine."""
 
-from ccxsa.state import AppState
+from ccxa.state import AppState
 
 
 def test_state_values():

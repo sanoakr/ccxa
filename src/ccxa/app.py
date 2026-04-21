@@ -8,13 +8,13 @@ import time
 
 import numpy as np
 
-from ccxsa.audio.capture import AudioCapture
-from ccxsa.audio.noise_gate import NoiseGate
-from ccxsa.audio.playback import ChimePlayer
-from ccxsa.config import AppConfig
-from ccxsa.llm.engine import LLMEngine
-from ccxsa.llm.prompt import build_messages
-from ccxsa.llm.tools import (
+from ccxa.audio.capture import AudioCapture
+from ccxa.audio.noise_gate import NoiseGate
+from ccxa.audio.playback import ChimePlayer
+from ccxa.config import AppConfig
+from ccxa.llm.engine import LLMEngine
+from ccxa.llm.prompt import build_messages
+from ccxa.llm.tools import (
     detect_currency_query,
     detect_detailed_request,
     detect_goodbye,
@@ -25,12 +25,12 @@ from ccxsa.llm.tools import (
     get_current_time_context,
     get_weather_context,
 )
-from ccxsa.search.web import WebSearch
-from ccxsa.stt.transcriber import Transcriber
-from ccxsa.state import AppState
-from ccxsa.tts.speaker import Speaker
-from ccxsa.vad.silero import SileroVAD, VADEvent
-from ccxsa.wakeword.detector import WakeWordDetector
+from ccxa.search.web import WebSearch
+from ccxa.stt.transcriber import Transcriber
+from ccxa.state import AppState
+from ccxa.tts.speaker import Speaker
+from ccxa.vad.silero import SileroVAD, VADEvent
+from ccxa.wakeword.detector import WakeWordDetector
 
 logger = logging.getLogger(__name__)
 

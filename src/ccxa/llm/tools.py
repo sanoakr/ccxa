@@ -77,7 +77,7 @@ def detect_currency_query(text: str) -> tuple[str, str] | None:
 def fetch_currency_rate(currency_code: str) -> float | None:
     """Fetch the exchange rate from Frankfurter API. Blocking call."""
     url = f"https://api.frankfurter.dev/v2/rate/{currency_code}/JPY"
-    req = urllib.request.Request(url, headers={"User-Agent": "ccxsa/0.1"})
+    req = urllib.request.Request(url, headers={"User-Agent": "ccxa/0.1"})
     try:
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = json.loads(resp.read())
@@ -165,7 +165,7 @@ def detect_weather_query(text: str) -> tuple[str, str] | None:
 def fetch_weather(location_slug: str) -> dict | None:
     """Fetch weather from wttr.in. Blocking call."""
     url = f"https://wttr.in/{location_slug}?format=j1"
-    req = urllib.request.Request(url, headers={"User-Agent": "ccxsa/0.1"})
+    req = urllib.request.Request(url, headers={"User-Agent": "ccxa/0.1"})
     try:
         with urllib.request.urlopen(req, timeout=5) as resp:
             return json.loads(resp.read())

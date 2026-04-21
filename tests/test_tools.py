@@ -1,6 +1,6 @@
 """Tests for intent detection tools."""
 
-from ccxsa.llm.tools import (
+from ccxa.llm.tools import (
     detect_currency_query,
     detect_detailed_request,
     detect_goodbye,

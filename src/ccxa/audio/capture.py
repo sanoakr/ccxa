@@ -7,8 +7,8 @@ import logging
 import numpy as np
 import sounddevice as sd
 
-from ccxsa.config import AudioConfig
-from ccxsa.utils.ring_buffer import RingBuffer
+from ccxa.config import AudioConfig
+from ccxa.utils.ring_buffer import RingBuffer
 
 logger = logging.getLogger(__name__)
 
