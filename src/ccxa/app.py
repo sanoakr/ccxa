@@ -81,6 +81,8 @@ class VoiceChatApp:
             max_tokens_long=config.llm.max_tokens_long,
             temperature=config.llm.temperature,
             top_p=config.llm.top_p,
+            port=config.llm.port,
+            base_url=config.llm.base_url,
         )
 
         # TTS
@@ -146,6 +148,7 @@ class VoiceChatApp:
         """Graceful shutdown."""
         self._running = False
         await self.speaker.stop()
+        self.llm.shutdown()
 
     async def _audio_processing_loop(self) -> None:
         """Continuously process audio chunks based on current state."""

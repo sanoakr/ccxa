@@ -44,6 +44,8 @@ class LLMConfig(BaseModel):
     max_tokens_long: int = 500
     temperature: float = 0.7
     top_p: float = 0.9
+    port: int = 8080
+    base_url: str | None = None
 
 
 class TTSConfig(BaseModel):
