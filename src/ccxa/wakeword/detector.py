@@ -9,6 +9,20 @@ this module uses a two-stage approach:
 Matching is intentionally fuzzy because Whisper often misspells unusual
 Japanese words.  We check exact substring match first, then fall back to
 edit-distance matching on the hiragana reading.
+
+Phonetic collision analysis (wake word = "ちちくさ", len=4)
+----------------------------------------------------------
+Device wake word     Normalized form      Min Levenshtein dist
+-----------------    -----------------    --------------------
+Amazon Alexa (JP)    あれくさ             2  <- EQUALS default threshold; UNSAFE
+Hey Siri             へいしり             4  (safe)
+OK Google            おーけーぐーぐる     4+ (safe)
+Hey Google (JP)      ねえぐーぐる         4+ (safe)
+Microsoft Cortana    こるたな             4  (safe)
+
+The deny_phrases list rejects Alexa before fuzzy matching runs.
+All other devices have dist >= 4 at fuzzy_threshold=2, but are included
+in the default deny list as a forward-compatible safeguard.
 """
 
 from __future__ import annotations
@@ -70,22 +84,34 @@ class WakeWordDetector:
     def __init__(
         self,
         phrases: list[str] | None = None,
+        deny_phrases: list[str] | None = None,
         max_duration_ms: int = 2000,
         fuzzy_threshold: int = 2,
     ) -> None:
         raw_phrases = phrases or ["チチクサ", "ちちくさ"]
         self._phrases = list({_normalize(p) for p in raw_phrases})
+        self._deny_phrases = list({_normalize(p) for p in (deny_phrases or [])})
         self.max_duration_ms = max_duration_ms
         self._fuzzy_threshold = fuzzy_threshold
         logger.info("Wake word phrases (normalized): %s", self._phrases)
+        if self._deny_phrases:
+            logger.info("Wake word deny phrases (normalized): %s", self._deny_phrases)
 
     def check(self, transcription: str) -> bool:
         """Check if a transcription matches the wake word.
 
-        1. Exact substring match (after normalization)
-        2. Fuzzy match: edit distance <= threshold on each sliding window
+        1. Deny gate: reject if any deny phrase is an exact normalized substring
+        2. Exact substring match (after normalization)
+        3. Fuzzy match: edit distance <= threshold on each sliding window
         """
         normalized = _normalize(transcription)
+
+        for deny in self._deny_phrases:
+            if deny in normalized:
+                logger.info(
+                    "Wake word DENIED ('%s' found in '%s')", deny, transcription
+                )
+                return False
 
         for phrase in self._phrases:
             # Exact substring
