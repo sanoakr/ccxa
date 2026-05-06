@@ -77,8 +77,34 @@ def detect_currency_query(text: str) -> tuple[str, str] | None:
     return None
 
 
-def fetch_currency_rate(currency_code: str) -> float | None:
-    """Fetch the exchange rate from Frankfurter API. Blocking call."""
+_YAHOO_FX_SYMBOLS: dict[str, str] = {
+    "USD": "USDJPY=X",
+    "EUR": "EURJPY=X",
+    "GBP": "GBPJPY=X",
+    "CNY": "CNYJPY=X",
+    "KRW": "KRWJPY=X",
+    "CHF": "CHFJPY=X",
+    "AUD": "AUDJPY=X",
+}
+
+
+def _fetch_yahoo_rate(symbol: str) -> float | None:
+    """Fetch real-time FX rate from Yahoo Finance v8 chart API."""
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1m&range=1d"
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read())
+            return data["chart"]["result"][0]["meta"]["regularMarketPrice"]
+    except (urllib.error.URLError, json.JSONDecodeError, KeyError, IndexError, TypeError) as e:
+        logger.warning("Yahoo Finance rate fetch failed: %s", e)
+    return None
+
+
+def _fetch_frankfurter_rate(currency_code: str) -> float | None:
+    """Fallback: fetch rate from Frankfurter (ECB daily). Blocking call."""
     url = f"https://api.frankfurter.dev/v2/rate/{currency_code}/JPY"
     req = urllib.request.Request(url, headers={"User-Agent": "ccxa/0.1"})
     try:
@@ -86,8 +112,18 @@ def fetch_currency_rate(currency_code: str) -> float | None:
             data = json.loads(resp.read())
             return data.get("rate")
     except (urllib.error.URLError, json.JSONDecodeError, KeyError) as e:
-        logger.error("Currency rate fetch failed: %s", e)
-        return None
+        logger.error("Frankfurter rate fetch failed: %s", e)
+    return None
+
+
+def fetch_currency_rate(currency_code: str) -> float | None:
+    """Fetch JPY exchange rate. Uses Yahoo Finance (real-time), falls back to Frankfurter."""
+    symbol = _YAHOO_FX_SYMBOLS.get(currency_code)
+    if symbol:
+        rate = _fetch_yahoo_rate(symbol)
+        if rate is not None:
+            return rate
+    return _fetch_frankfurter_rate(currency_code)
 
 
 def get_currency_context(currency_code: str, display_name: str) -> str:
