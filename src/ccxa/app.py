@@ -29,7 +29,7 @@ from ccxa.search.web import WebSearch
 from ccxa.stt.transcriber import Transcriber
 from ccxa.state import AppState
 from ccxa.tts.speaker import Speaker
-from ccxa.utils.text import is_question
+from ccxa.utils.text import is_question, strip_filler_suffix
 from ccxa.vad.silero import SileroVAD, VADEvent
 from ccxa.wakeword.detector import WakeWordDetector
 
@@ -329,7 +329,12 @@ class VoiceChatApp:
 
         logger.info("Assistant: %s", response)
 
-        # Update conversation history
+        # Strip filler suffix before speaking (e.g. 「他に何かありますか？」)
+        spoken = strip_filler_suffix(response)
+        if spoken != response:
+            logger.info("Filler suffix stripped: '%s' -> '%s'", response, spoken)
+
+        # Update conversation history (use original response for context)
         self.conversation_history.append({"role": "user", "content": text})
         self.conversation_history.append(
             {"role": "assistant", "content": response}
@@ -338,7 +343,7 @@ class VoiceChatApp:
         # Speak response (can be interrupted by barge-in)
         self.state = AppState.SPEAKING
         self._bargein_counter = 0
-        completed = await self.speaker.speak(response)
+        completed = await self.speaker.speak(spoken)
 
         # Flush stale audio (bot's own voice + anything buffered during processing)
         self._flush_audio()

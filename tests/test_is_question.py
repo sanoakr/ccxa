@@ -44,3 +44,17 @@ def testis_question_true(text: str) -> None:
 ])
 def testis_question_false(text: str) -> None:
     assert not is_question(text), f"Expected non-question: {text!r}"
+
+
+# --- strip_filler_suffix ---
+
+from ccxa.utils.text import strip_filler_suffix
+
+def test_strip_filler_removes_trailing_filler():
+    assert strip_filler_suffix("承知しました。他に何かありますか？") == "承知しました。"
+    assert strip_filler_suffix("9時35分発です。何かご質問はありますか？") == "9時35分発です。"
+    assert strip_filler_suffix("まだ他にご希望ですか？") == "まだ他にご希望ですか？"  # 全文がフィラーなら元のまま
+
+def test_strip_filler_preserves_non_filler():
+    assert strip_filler_suffix("どの駅ですか？") == "どの駅ですか？"
+    assert strip_filler_suffix("今日は晴れです。") == "今日は晴れです。"

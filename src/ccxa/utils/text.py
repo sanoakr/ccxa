@@ -26,6 +26,22 @@ _FILLER_RE = re.compile(
 )
 
 
+# 文区切りパターン（句点・感嘆符・疑問符の後）
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[。！？!?])\s*")
+
+
+def strip_filler_suffix(text: str) -> str:
+    """末尾のフィラー質問文を除去して返す。
+
+    「他に何かありますか？」などの社交的な確認文を読み上げないようにする。
+    """
+    sentences = [s for s in _SENTENCE_SPLIT_RE.split(text.strip()) if s]
+    while sentences and _FILLER_RE.search(sentences[-1]):
+        sentences.pop()
+    result = "".join(sentences).strip()
+    return result if result else text.strip()
+
+
 def is_question(text: str) -> bool:
     """Return True if the response is a clarifying question needing a follow-up.
 
