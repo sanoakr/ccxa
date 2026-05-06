@@ -101,6 +101,7 @@ class VoiceChatApp:
         self.conversation_history: list[dict[str, str]] = []
         self._last_activity: float = 0
         self._rms_log_counter: int = 0
+        self._wakeword_stt_busy: bool = False
 
     def _flush_audio(self) -> None:
         """Discard buffered audio and reset VAD state.
@@ -220,20 +221,28 @@ class VoiceChatApp:
             )
             return
 
-        # Transcribe the short utterance
         if not self.stt.is_loaded:
             logger.debug("STT not loaded yet, ignoring segment")
             return
 
-        text = await asyncio.to_thread(self.stt.transcribe, event.audio)
-        logger.info("Wake word STT result: '%s'", text)
-
-        if not text:
+        # STT runs as a background task so the audio loop keeps feeding VAD.
+        # Skip if a previous wake-word STT is still running (no queue needed).
+        if self._wakeword_stt_busy:
+            logger.debug("Wake word STT busy, skipping segment")
             return
 
-        # Check for wake word
-        if self.wakeword.check(text):
-            await self._activate()
+        asyncio.create_task(self._check_wakeword(event))
+
+    async def _check_wakeword(self, event: VADEvent) -> None:
+        """Transcribe and check one wake-word candidate (background task)."""
+        self._wakeword_stt_busy = True
+        try:
+            text = await asyncio.to_thread(self.stt.transcribe, event.audio)
+            logger.info("Wake word STT result: '%s'", text)
+            if text and self.state == AppState.IDLE and self.wakeword.check(text):
+                await self._activate()
+        finally:
+            self._wakeword_stt_busy = False
 
     async def _activate(self) -> None:
         """Transition from IDLE to LISTENING."""
