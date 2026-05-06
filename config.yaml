@@ -27,7 +27,7 @@ wakeword:
     - "オーケーグーグル"   # OK Google
     - "ねえグーグル"       # ねえ Google
     - "コルタナ"           # Microsoft Cortana
-  max_duration_ms: 3000
+  max_duration_ms: 1500
   fuzzy_threshold: 1
 
 stt:
