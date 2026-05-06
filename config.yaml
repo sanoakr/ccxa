@@ -1,5 +1,5 @@
 audio:
-  input_device: null
+  input_device: "EMEET OfficeCore M0 Plus"
   sample_rate: 16000
   channels: 1
   chunk_ms: 32
@@ -27,8 +27,8 @@ wakeword:
     - "オーケーグーグル"   # OK Google
     - "ねえグーグル"       # ねえ Google
     - "コルタナ"           # Microsoft Cortana
-  max_duration_ms: 1500
-  fuzzy_threshold: 1
+  max_duration_ms: 2500
+  fuzzy_threshold: 2
 
 stt:
   model: "holotherapper/lilfugu-8bit"
