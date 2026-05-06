@@ -29,11 +29,11 @@ from ccxa.search.web import WebSearch
 from ccxa.stt.transcriber import Transcriber
 from ccxa.state import AppState
 from ccxa.tts.speaker import Speaker
+from ccxa.utils.text import is_question
 from ccxa.vad.silero import SileroVAD, VADEvent
 from ccxa.wakeword.detector import WakeWordDetector
 
 logger = logging.getLogger(__name__)
-
 
 class VoiceChatApp:
     """Main application: manages the state machine and coordinates all components."""
@@ -64,6 +64,7 @@ class VoiceChatApp:
         # Wake word
         self.wakeword = WakeWordDetector(
             phrases=config.wakeword.phrases,
+            deny_phrases=config.wakeword.deny_phrases,
             max_duration_ms=config.wakeword.max_duration_ms,
             fuzzy_threshold=config.wakeword.fuzzy_threshold,
         )
@@ -341,11 +342,22 @@ class VoiceChatApp:
 
         # Flush stale audio (bot's own voice + anything buffered during processing)
         self._flush_audio()
-        self.state = AppState.LISTENING
-        self._last_activity = time.monotonic()
 
         if not completed:
-            logger.info("Response was interrupted by user")
+            # Barge-in: end session immediately
+            logger.info("Response interrupted by user, ending session")
+            self.state = AppState.IDLE
+            self.conversation_history.clear()
+        elif is_question(response):
+            # Question response: keep session alive for one more user turn
+            logger.info("Response is a question, staying in LISTENING")
+            self.state = AppState.LISTENING
+            self._last_activity = time.monotonic()
+        else:
+            # Statement: one-turn complete, end session
+            logger.info("Response complete, ending session")
+            self.state = AppState.IDLE
+            self.conversation_history.clear()
 
     async def _timeout_loop(self) -> None:
         """Monitor for conversation timeout and return to IDLE."""

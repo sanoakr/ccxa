@@ -29,6 +29,13 @@ class VADConfig(BaseModel):
 
 class WakeWordConfig(BaseModel):
     phrases: list[str] = ["チチクサ", "ちちくさ"]
+    deny_phrases: list[str] = [
+        "アレクサ",         # Amazon Alexa → あれくさ (dist=2 from ちちくさ, UNSAFE)
+        "ヘイシリ",         # Hey Siri → へいしり (dist=4, 予防的)
+        "オーケーグーグル", # OK Google
+        "ねえグーグル",     # ねえ Google
+        "コルタナ",         # Microsoft Cortana
+    ]
     max_duration_ms: int = 3000
     fuzzy_threshold: int = 2
 
