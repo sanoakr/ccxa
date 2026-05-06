@@ -1,6 +1,6 @@
 [project]
 name = "ccxa"
-version = "0.3.7"
+version = "0.3.8"
 description = "Japanese Voice Chat Assistant"
 requires-python = ">=3.11,<3.14"
 dependencies = [
