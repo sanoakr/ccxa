@@ -37,7 +37,7 @@ class WakeWordConfig(BaseModel):
         "コルタナ",         # Microsoft Cortana
     ]
     max_duration_ms: int = 3000
-    fuzzy_threshold: int = 2
+    fuzzy_threshold: int = 1
 
 
 class STTConfig(BaseModel):

@@ -28,7 +28,7 @@ wakeword:
     - "ねえグーグル"       # ねえ Google
     - "コルタナ"           # Microsoft Cortana
   max_duration_ms: 3000
-  fuzzy_threshold: 2
+  fuzzy_threshold: 1
 
 stt:
   model: "holotherapper/lilfugu-8bit"

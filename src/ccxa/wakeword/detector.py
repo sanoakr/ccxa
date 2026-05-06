@@ -42,13 +42,21 @@ _NORMALIZE_MAP = str.maketrans(
     "まみむめもゃやゅゆょよらりるれろゎわゐゑをんゔゕゖー",
 )
 
-# Common kanji that Whisper may output for "ちちくさ"
+# Common kanji/kana variants that Whisper may output for "ちちくさ".
+# Aliases are applied before fuzzy matching so threshold=1 suffices.
 _KANJI_ALIASES = {
+    # 漢字表記
     "千草": "ちくさ",
     "乳草": "ちちくさ",
     "父草": "ちちくさ",
     "知地草": "ちちくさ",
+    "ちち草": "ちちくさ",
+    "チチ草": "ちちくさ",
+    # カタカナ（normalize で変換されるが念のため）
     "チチクサ": "ちちくさ",
+    # Whisper が出力しやすい促音・長音バリエーション
+    "チッチクサ": "ちちくさ",
+    "ちっちくさ": "ちちくさ",
 }
 
 
