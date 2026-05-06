@@ -58,7 +58,10 @@ _CURRENCY_MAP: list[tuple[re.Pattern[str], str, str]] = [
     (re.compile(r"(豪ドル|オーストラリアドル)"), "AUD", "豪ドル"),
 ]
 
-_RATE_KEYWORDS = re.compile(r"(いくら|何円|なんえん|レート|れーと|為替|かわせ)")
+_RATE_KEYWORDS = re.compile(
+    r"(いくら|何円|なんえん|レート|れーと|為替|かわせ"
+    r"|ドル円|ユーロ円|ポンド円|ウォン円|フラン円|豪ドル円|オーストラリアドル円)"
+)
 
 
 def detect_currency_query(text: str) -> tuple[str, str] | None:
