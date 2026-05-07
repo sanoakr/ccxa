@@ -9,6 +9,17 @@ import time
 
 logger = logging.getLogger(__name__)
 
+# Stop sequences that indicate the model is outputting its internal format
+# rather than a real answer. Generation is halted before these tokens appear.
+_STOP_SEQUENCES = ["SUMMARY:", "TAGS:", "\nSUMMARY", "\nTAGS"]
+
+# Fragments that appear when the model echoes the system prompt in its output.
+_SYSTEM_PROMPT_FRAGMENTS = [
+    "記号・マークダウン・箇条書き",
+    "話し言葉で1〜2文",
+    "確認・締め括りは言わない",
+]
+
 
 class LLMEngine:
     """Ternary Bonsai 8B inference via mlx_lm.server + OpenAI client."""
@@ -93,6 +104,18 @@ class LLMEngine:
     def is_loaded(self) -> bool:
         return self._client is not None
 
+    def _is_valid_response(self, text: str) -> bool:
+        """Return False if the model is echoing internal format or the system prompt."""
+        t = text.strip()
+        if not t:
+            return False
+        if t.startswith("SUMMARY") or "TAGS:" in t:
+            return False
+        for fragment in _SYSTEM_PROMPT_FRAGMENTS:
+            if fragment in t:
+                return False
+        return True
+
     def generate(
         self, messages: list[dict[str, str]], detailed: bool = False
     ) -> str:
@@ -102,14 +125,25 @@ class LLMEngine:
 
         max_tokens = self._max_tokens_long if detailed else self._max_tokens_short
 
-        response = self._client.chat.completions.create(
-            model=self._model_id,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=self._temperature,
-            top_p=self._top_p,
-        )
-        return response.choices[0].message.content.strip()
+        for attempt in range(2):
+            response = self._client.chat.completions.create(
+                model=self._model_id,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=self._temperature,
+                top_p=self._top_p,
+                stop=_STOP_SEQUENCES,
+            )
+            text = response.choices[0].message.content.strip()
+            if self._is_valid_response(text):
+                return text
+            logger.warning(
+                "LLM returned malformed response (attempt %d): %r",
+                attempt + 1,
+                text[:120],
+            )
+
+        return "すみません、うまく答えられませんでした。"
 
     def shutdown(self) -> None:
         """Stop the managed mlx_lm.server process."""
